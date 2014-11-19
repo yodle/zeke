@@ -10,10 +10,10 @@ setup(
     packages=['zeke'],
     entry_points={
         'console_scripts': [
-            'scooper = zeke.zeke:main'
+            'zeke = zeke.zeke:main'
         ]
     },
-    install_requires=['kazoo', 'dnspython'],
+    install_requires=['kazoo'],
     test_suite='test',
     classifiers=[
         'Programming Language :: Python :: 2',
