@@ -1,8 +1,9 @@
 from kazoo import exceptions as KazooExceptions
 
+from . import dns
 
 def discover():
-    for result in discover_zk_via_dns():
+    for result in dns.discover_zk_via_dns():
         print(result)
 
 

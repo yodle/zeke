@@ -1,16 +1,16 @@
 from setuptools import setup
 
 setup(
-    name='scooper',
+    name='zeke',
     version='0.0.1',
     author='Yodle',
     author_email='noreply@yodle.com',
-    url='http://git.yodle.com/markdrago/scooper',
-    description='Get values out of zookeeper',
-    packages=['scooper'],
+    url='http://git.yodle.com/markdrago/zeke',
+    description='Mess around with zookeeper',
+    packages=['zeke'],
     entry_points={
         'console_scripts': [
-            'scooper = scooper.scooper:main'
+            'scooper = zeke.zeke:main'
         ]
     },
     install_requires=['kazoo', 'dnspython'],
@@ -24,6 +24,6 @@ setup(
         'Topic :: Utilities'
     ],
     long_description="""
-**Scooper gets values out of zookeeper.**
+**Zeke lets you mess around with zookeeper**
 """
 )

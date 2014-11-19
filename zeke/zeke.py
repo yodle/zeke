@@ -23,7 +23,7 @@ def get_value(key, address):
 
 
 def main():
-    parser = argparse.ArgumentParser(description='Work with Zookeeper')
+    parser = argparse.ArgumentParser(description='Mess around with Zookeeper')
     parser.add_argument('--discover', action='store_true', help='discover zookeeper via DNS and output its host:port')
     parser.add_argument('-g', '--get', help="get value out of zookeeper and print it")
     parser.add_argument('-a', '--address', help="specify the host/port of zookeeper")
