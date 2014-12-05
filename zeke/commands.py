@@ -2,11 +2,11 @@ from __future__ import print_function
 
 import sys
 
-from . import zookeeper, dns
+from . import zookeeper, dnsops
 
 
 def discover():
-    for result in dns.discover_zk_via_dns():
+    for result in dnsops.discover_zk_via_dns():
         print(result)
 
 
@@ -24,7 +24,7 @@ def get_zk_hosts(host):
     if host:
         return [host]
     else:
-        return dns.discover_zk_via_dns()
+        return dnsops.discover_zk_via_dns()
 
 
 class CommandError(Exception):
