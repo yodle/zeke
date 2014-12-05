@@ -20,8 +20,8 @@ def main():
 def parse_options(args):
     parser = argparse.ArgumentParser(description='Mess around with Zookeeper')
     parser.add_argument('--discover', action='store_true', help='discover zookeeper via DNS and output its host:port')
-    parser.add_argument('-g', '--get', help='get value out of zookeeper and print it')
-    parser.add_argument('-a', '--address', help='specify the host/port of zookeeper')
+    parser.add_argument('-g', '--get', help='get value out of zookeeper and print it', metavar='KEY')
+    parser.add_argument('-a', '--address', help='specify the host/port of zookeeper', metavar='ADDR')
     return vars(parser.parse_args(args))
 
 
