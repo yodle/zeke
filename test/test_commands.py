@@ -1,17 +1,16 @@
 import unittest
 from unittest.mock import Mock
 
-from zeke import commands
+from zeke import commands, zookeeper
 
 
 class TestCommands(unittest.TestCase):
     def setUp(self):
         commands.dnsops.discover_zk_via_dns = Mock(return_value=['host.example.com:1234'])
         commands.print = Mock()
-
-    def tearDown(self):
-        commands.dnsops.discover_zk_via_dns.reset_mock()
-        commands.print.reset_mock()
+        self.mock_zk = Mock()
+        self.mock_zk.get_value = Mock(return_value=b'value')
+        commands.zookeeper.Zookeeper = Mock(return_value=self.mock_zk)
 
     def test_command_discover(self):
         commands.discover()
@@ -27,3 +26,15 @@ class TestCommands(unittest.TestCase):
         result = commands.get_zk_hosts(None)
         self.assertEqual(result, ['host.example.com:1234'])
         commands.dnsops.discover_zk_via_dns.assert_called_once_with()
+
+    def test_print_value_success(self):
+        commands.print_value('key', 'host:123')
+        commands.zookeeper.Zookeeper.assert_called_once_with(['host:123'])
+        self.mock_zk.get_value.assert_called_once_with('key')
+        commands.print.assert_called_once_with('value')
+
+    def test_print_value_with_exception(self):
+        self.mock_zk.get_value.side_effect = zookeeper.NoNodeError
+        with self.assertRaises(commands.CommandError):
+            commands.print_value('key', 'host:123')
+        self.assertTrue(commands.print.called)
