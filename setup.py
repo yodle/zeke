@@ -13,6 +13,7 @@ setup(
             'zeke = zeke.zeke:main'
         ]
     },
+    tests_require=['mock'],
     install_requires=['kazoo'],
     test_suite='test',
     classifiers=[

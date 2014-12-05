@@ -3,3 +3,4 @@
 *.iml
 *.pyc
 __pycache__/
+.eggs/
