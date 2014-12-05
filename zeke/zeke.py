@@ -5,11 +5,7 @@ from . import commands
 
 
 def main():
-    parser = argparse.ArgumentParser(description='Mess around with Zookeeper')
-    parser.add_argument('--discover', action='store_true', help='discover zookeeper via DNS and output its host:port')
-    parser.add_argument('-g', '--get', help='get value out of zookeeper and print it')
-    parser.add_argument('-a', '--address', help='specify the host/port of zookeeper')
-    parser_results = vars(parser.parse_args())
+    parser_results = parse_options(sys.argv[1:])
 
     try:
         if parser_results['discover']:
@@ -19,6 +15,15 @@ def main():
     except commands.CommandError:
         return 1
     return 0
+
+
+def parse_options(args):
+    parser = argparse.ArgumentParser(description='Mess around with Zookeeper')
+    parser.add_argument('--discover', action='store_true', help='discover zookeeper via DNS and output its host:port')
+    parser.add_argument('-g', '--get', help='get value out of zookeeper and print it')
+    parser.add_argument('-a', '--address', help='specify the host/port of zookeeper')
+    return vars(parser.parse_args(args))
+
 
 if __name__ == '__main__':
     sys.exit(main())
