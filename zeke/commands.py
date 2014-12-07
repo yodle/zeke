@@ -20,6 +20,11 @@ def print_value(key, host):
         raise CommandError(e)
 
 
+def set_value(key, value, host):
+    zk = zookeeper.Zookeeper(get_zk_hosts(host))
+    zk.set_or_create(key, value)
+
+
 def get_zk_hosts(host):
     if host:
         return [host]
