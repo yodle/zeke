@@ -69,13 +69,19 @@ class TestZeke(unittest.TestCase):
         zeke.dispatch(self.create_parser_results({'set': ('key', 'value'), 'address': 'host'}))
         set_value_mock.assert_called_once_with('key', 'value', 'host')
 
+    @patch('zeke.commands.dump')
+    def test_dispatch_to_set_value(self, dump_mock):
+        zeke.dispatch(self.create_parser_results({'dump': 'key'}))
+        dump_mock.assert_called_once_with('key', None)
+
     @staticmethod
     def create_parser_results(args):
         results = {
             'discover': False,
             'get': None,
             'address': None,
-            'set': None
+            'set': None,
+            'dump': None
         }
         results.update(args)
         return results

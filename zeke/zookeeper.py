@@ -20,6 +20,9 @@ class Zookeeper(object):
             raise NoNodeError(e)
         return data
 
+    def get_values(self, keys):
+        return list(map(lambda k: (k, self.get_value(k)), keys))
+
     def key_exists(self, key):
         stat = self.zk.exists(key)
         return stat is not None
@@ -41,6 +44,30 @@ class Zookeeper(object):
             self.set_value(key, value)
         else:
             self.create_node(key, value)
+
+    def get_children(self, key):
+        try:
+            return self.zk.get_children(key)
+        except kazooExceptions.NoNodeError as e:
+            raise NoNodeError(e)
+
+    def get_descendants_of_node(self, key):
+        # remove trailing slash, and treat an empty path as the root path
+        key = key.rstrip('/')
+        if key == '':
+            results = frozenset(['/'])
+        else:
+            results = frozenset([key])
+
+        # get the full paths of this node's immediate children
+        children = self.get_children(key)
+        children_full_paths = frozenset(map(lambda c: key + '/' + c, children))
+
+        # recursively call this function for each child, collect all results in a set
+        for child in children_full_paths:
+            results = results | self.get_descendants_of_node(child)
+
+        return results
 
     @staticmethod
     def value_str_to_bytestring(value):

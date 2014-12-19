@@ -12,6 +12,7 @@ try:
 except ImportError:
     builtins_name = '__builtin__'
 
+import sys
 from zeke import commands, zookeeper
 
 
@@ -59,3 +60,41 @@ class TestCommands(unittest.TestCase):
         with self.assertRaises(commands.CommandError):
             commands.print_value('key', 'host:123')
         self.assertTrue(mock_print.called)
+
+    def test_format_pairs_for_output(self):
+        pairs = [
+            ['/a/b', b'3'],
+            ['/c/d', b'4']
+        ]
+        result = commands._format_pairs_for_output(pairs)
+        expected = '["/a/b", "3"]\n["/c/d", "4"]'
+        self.assertEqual(result, expected)
+
+    def test_get_sorted_list_of_descendants_sorts_results(self):
+        mock_zk = Mock()
+        mock_zk.get_descendants_of_node.return_value = {'/a/c', '/a/b', '/a/d'}
+        commands._get_sorted_list_of_descendants_with_values(mock_zk, '/a')
+        mock_zk.get_values.assert_called_once_with(['/a/b', '/a/c', '/a/d'])
+
+    @patch(builtins_name + '.print')
+    @patch('zeke.commands.zookeeper.Zookeeper')
+    def test_dump_prints_results_properly(self, mock_zookeeper, mock_print):
+        mock_zk = Mock()
+        mock_zk.get_descendants_of_node.return_value = {'/a/b'}
+        mock_zk.get_values.return_value = [('/a/b', b'1')]
+        mock_zookeeper.return_value = mock_zk
+
+        commands.dump('/a', 'host')
+        expected = '["/a/b", "1"]'
+        mock_print.assert_called_once_with(expected)
+
+    @patch(builtins_name + '.print')
+    @patch('zeke.commands.zookeeper.Zookeeper')
+    def test_dump_prints_error_on_no_node_error(self, mock_zookeeper, mock_print):
+        mock_zk = Mock()
+        mock_zk.get_descendants_of_node.side_effect = zookeeper.NoNodeError
+        mock_zookeeper.return_value = mock_zk
+
+        with self.assertRaises(commands.CommandError):
+            commands.dump('/a', 'host')
+        mock_print.assert_called_once_with('Node not found', file=sys.stderr)

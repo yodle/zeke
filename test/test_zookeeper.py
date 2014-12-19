@@ -104,6 +104,76 @@ class TestZookeeper(unittest.TestCase):
         zk.set_or_create('key', 'value')
         mock_create_node.assert_called_once_with('key', 'value')
 
+    @patch('zeke.zookeeper.KazooClient')
+    def test_get_children_calls_kazoo_properly(self, mock_kazoo_client):
+        mock_zk = self.setup_mock_zk(mock_kazoo_client)
+        mock_zk.get_children.return_value = ['/key/one', '/key/two']
+        zk = zookeeper.Zookeeper(['host:1234'])
+        result = zk.get_children('/key')
+        self.assertEqual(['/key/one', '/key/two'], result)
+        mock_zk.get_children.called_once_with('/key')
+
+    @patch('zeke.zookeeper.KazooClient')
+    def test_get_children_raises_no_node_error(self, mock_kazoo_client):
+        mock_zk = self.setup_mock_zk(mock_kazoo_client)
+        mock_zk.get_children.side_effect = kazooExceptions.NoNodeError
+        zk = zookeeper.Zookeeper(['host:1234'])
+        with self.assertRaises(zookeeper.NoNodeError):
+            zk.get_children('/key')
+
+    @patch('zeke.zookeeper.KazooClient')
+    @patch('zeke.zookeeper.Zookeeper.get_children')
+    def test_get_descendants_of_node_includes_slash_for_root(self, mock_get_children, _):
+        zk = zookeeper.Zookeeper(['host:1234'])
+        mock_get_children.return_value = []
+        result = zk.get_descendants_of_node('/')
+        self.assertEqual(frozenset(['/']), result)
+
+    @patch('zeke.zookeeper.KazooClient')
+    @patch('zeke.zookeeper.Zookeeper.get_children')
+    def test_get_descendants_gets_children_properly(self, mock_get_children, _):
+        zk = zookeeper.Zookeeper(['host:1234'])
+
+        # this bit of magic makes the mock return ['abc','def'] only when called with a '', otherwise it returns []
+        mock_results = {'': ['abc', 'def']}
+        mock_get_children.side_effect = lambda x: mock_results.get(x, [])
+
+        result = zk.get_descendants_of_node('/')
+        self.assertEqual(frozenset(['/', '/abc', '/def']), result)
+
+    @patch('zeke.zookeeper.KazooClient')
+    @patch('zeke.zookeeper.Zookeeper.get_children')
+    def test_get_descendants_gets_grandkids(self, mock_get_children, _):
+        zk = zookeeper.Zookeeper(['host:1234'])
+
+        # have the return value of the mock depend on the parameter it is called with
+        mock_results = {'': ['abc', 'def'], '/abc': ['123']}
+        mock_get_children.side_effect = lambda x: mock_results.get(x, [])
+
+        result = zk.get_descendants_of_node('/')
+        self.assertEqual(frozenset(['/', '/abc', '/abc/123', '/def']), result)
+
+    @patch('zeke.zookeeper.KazooClient')
+    @patch('zeke.zookeeper.Zookeeper.get_value')
+    def test_get_values(self, mock_get_value, _):
+        zk = zookeeper.Zookeeper(['host:1234'])
+
+        # have the return value of the mock depend on the paramter it is called with
+        mock_results = {'/a': '1', '/b': '2'}
+        mock_get_value.side_effect = mock_results.get
+
+        result = zk.get_values(['/a', '/b'])
+        self.assertEqual([('/a', '1'), ('/b', '2')], list(result))
+
+    @patch('zeke.zookeeper.KazooClient')
+    def test_get_values_throws_no_node_error(self, mock_kazoo_client):
+        mock_zk = self.setup_mock_zk(mock_kazoo_client)
+        mock_zk.get.side_effect = kazooExceptions.NoNodeError
+
+        zk = zookeeper.Zookeeper(['host:1234'])
+        with self.assertRaises(zookeeper.NoNodeError):
+            zk.get_values(['/a'])
+
     @staticmethod
     def setup_mock_zk(mock_kazoo_client):
         mock_zk = Mock()
