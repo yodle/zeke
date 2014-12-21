@@ -14,6 +14,7 @@ def parse_options(args):
     parser.add_argument('-g', '--get', help='get value out of zookeeper and print it', metavar='KEY')
     parser.add_argument('-s', '--set', help='set value in zookeeper', nargs=2, metavar=('KEY', 'VAL'))
     parser.add_argument('-d', '--dump', help='dump child nodes of given key to stdout', metavar='KEY')
+    parser.add_argument('-l', '--load', action='store_true', help='load nodes and values in to zookeeper from stdin')
     parser.add_argument('-a', '--address', help='specify the host/port of zookeeper', metavar='ADDR')
     return vars(parser.parse_args(args))
 
@@ -28,6 +29,8 @@ def dispatch(parser_results):
             commands.set_value(parser_results['set'][0], parser_results['set'][1], parser_results['address'])
         elif parser_results['dump']:
             commands.dump(parser_results['dump'], parser_results['address'])
+        elif parser_results['load']:
+            commands.load(parser_results['address'])
     except commands.CommandError:
         return 1
     return 0

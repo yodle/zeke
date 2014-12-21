@@ -44,6 +44,16 @@ class TestZeke(unittest.TestCase):
         results = zeke.parse_options(args)
         self.assertEqual(results['set'], ['a', 'b'])
 
+    def test_load_long(self):
+        args = ['--load']
+        results = zeke.parse_options(args)
+        self.assertTrue(results['load'])
+
+    def test_load_short(self):
+        args = ['-l']
+        results = zeke.parse_options(args)
+        self.assertTrue(results['load'])
+
     @patch('zeke.commands.discover')
     def test_dispatch_to_discover(self, discover_mock):
         zeke.dispatch(self.create_parser_results({'discover': True}))
@@ -70,9 +80,14 @@ class TestZeke(unittest.TestCase):
         set_value_mock.assert_called_once_with('key', 'value', 'host')
 
     @patch('zeke.commands.dump')
-    def test_dispatch_to_set_value(self, dump_mock):
+    def test_dispatch_to_dump(self, dump_mock):
         zeke.dispatch(self.create_parser_results({'dump': 'key'}))
         dump_mock.assert_called_once_with('key', None)
+
+    @patch('zeke.commands.load')
+    def test_dispatch_to_load(self, load_mock):
+        zeke.dispatch(self.create_parser_results({'load': True}))
+        load_mock.assert_called_once_with(None)
 
     @staticmethod
     def create_parser_results(args):
@@ -81,7 +96,8 @@ class TestZeke(unittest.TestCase):
             'get': None,
             'address': None,
             'set': None,
-            'dump': None
+            'dump': None,
+            'load': False
         }
         results.update(args)
         return results

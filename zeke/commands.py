@@ -48,6 +48,35 @@ def _format_pairs_for_output(pairs):
     return '\n'.join(list_of_json_lists)
 
 
+def load(host):
+    pairs = _parse_all_lines(sys.stdin)
+    _load_pairs(get_zk(host), pairs)
+
+
+def _load_pairs(zk, pairs):
+    for pair in pairs:
+        zk.set_or_create(pair[0], pair[1])
+
+
+def _parse_all_lines(line_source):
+    pairs = []
+    for line in line_source:
+        pairs.append(_parse_line(line))
+    return pairs
+
+
+def _parse_line(line):
+    try:
+        pair = json.loads(line)
+    except ValueError as e:
+        raise CommandError(e)
+    if type(pair) != list:
+        raise CommandError('expected line to be of type list but found something else: %s' % type(pair))
+    if len(pair) != 2:
+        raise CommandError('expected 2 elements in line (key/value), but got %d' % len(pair))
+    return tuple(map(lambda item: str(item), pair))
+
+
 def get_zk(host):
     return zookeeper.Zookeeper(get_zk_hosts(host))
 

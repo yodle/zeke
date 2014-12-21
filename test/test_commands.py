@@ -98,3 +98,63 @@ class TestCommands(unittest.TestCase):
         with self.assertRaises(commands.CommandError):
             commands.dump('/a', 'host')
         mock_print.assert_called_once_with('Node not found', file=sys.stderr)
+
+    def test_parse_line_raises_command_error_for_bad_json(self):
+        with self.assertRaises(commands.CommandError):
+            commands._parse_line('some line that is not json')
+
+    def test_parse_line_raises_when_given_too_few_items(self):
+        with self.assertRaises(commands.CommandError):
+            commands._parse_line('["/a/b"]')
+
+    def test_parse_line_raises_when_given_too_many_items(self):
+        with self.assertRaises(commands.CommandError):
+            commands._parse_line('["/a/b", "val", "something extra"]')
+
+    def test_parse_line_raises_when_given_dictionary(self):
+        with self.assertRaises(commands.CommandError):
+            commands._parse_line('{"hello": "there", "more": "stuff"}')
+
+    def test_parse_line_converts_items_to_strings(self):
+        results = commands._parse_line('["/a", 3]')
+        self.assertEqual(results[1], "3")
+
+    def test_parse_line_works_properly_given_normal_input(self):
+        results = commands._parse_line('["/a", "hello"]')
+        self.assertEqual(("/a", "hello"), results)
+
+    def test_parse_all_lines_can_parse_multiple_lines(self):
+        lines = [
+            '["/a", "hello"]',
+            '["/b", "there"]'
+        ]
+        results = commands._parse_all_lines(lines)
+        expected = [
+            ("/a", "hello"),
+            ("/b", "there")
+        ]
+        self.assertEqual(results, expected)
+
+    def test_load_pairs_calls_zk_set_or_create_properly(self):
+        zk = Mock()
+        pairs = [
+            ("/a", "hello"),
+            ("/b", "there")
+        ]
+        commands._load_pairs(zk, pairs)
+        zk.set_or_create.assert_any_call("/a", "hello")
+        zk.set_or_create.assert_any_call("/b", "there")
+        self.assertEqual(zk.set_or_create.call_count, 2)
+
+    @patch('zeke.commands.sys.stdin')
+    @patch('zeke.commands.zookeeper.Zookeeper')
+    def test_load_parses_lines_from_stdin_and_loads_them(self, mock_zookeeper, mock_stdin):
+        zk = Mock()
+        mock_zookeeper.return_value = zk
+        mock_stdin.__iter__.return_value = ['["/a", "hey"]', '["/b", "there"]']
+
+        commands.load('host:1234')
+
+        zk.set_or_create.assert_any_call("/a", "hey")
+        zk.set_or_create.assert_any_call("/b", "there")
+        self.assertEqual(zk.set_or_create.call_count, 2)
