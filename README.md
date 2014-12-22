@@ -26,6 +26,10 @@ $ zeke -d /path/to/dump > dumpfile.zk
 
 #### Load a file with node/value pairs in to zookeeper
 ```sh
+$ cat dumpfile.zk
+["/each/line/must/be/a/valid", "2-element"]
+["/json/list/of/key/value/pairs", "thanks"]
+
 $ zeke -l < dumpfile.zk
 ```
 
@@ -57,3 +61,14 @@ Zeke was written to replace our old script zkconfig.py.  Zeke is an improvement 
 - Zeke writes and reads json, zkconfig wrote stringified python lists and parsed them using eval
 - Zeke has unit tests, zkconfig did not
 
+I started writing zeke after writing the following line to get a value out of zookeeper with zkconfig:
+```sh
+graphite_host=`/opt/zkconfig/zkconfig.py -g /dev/null -d -p /com/yodle/conf/tech/metrics/graphite-host 2> /dev/null | grep graphite-host | grep -v -e server-specific -e '#' | sed -e "s/.*graphite-host', '//" -e "s/'.*//"`
+```
+
+### Todo
+
+- zkconfig had the ability to purge a branch from zookeeper, zeke lacks this support
+- zkconfig had the ability to prepend a path to the node names while loading a file.  I'm not sure that we ever used this feature, but zeke doesn't have it.
+- zkconfig logged all of its actions to a place in /natpal/logs.  I don't like the idea of hard-coding a log location like this, and I'm not sure that we have ever looked at the zkconfig logs anyway.
+- zkconfig can load files that were created by zeke, but due to the strict quoting rules of json (only double-quotes are valid), zeke can not load files that were created by zkconfig
