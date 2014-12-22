@@ -31,6 +31,7 @@ $ zeke -l < dumpfile.zk
 
 #### Discover Zookeeper via DNS
 The commands get, set, dump, and load default to using the zookeeper they discover via DNS.  By using --discover you can get the location of the discovered zookeeper nodes.
+
 ```sh
 $ zeke --discover
 dev-zk1.dev.yodle.com:2181
@@ -40,12 +41,14 @@ dev-zk2.dev.yodle.com:2181
 
 #### Specify the location of zookeeper
 It is possible to override the DNS discovery mechanism by specifying the location of zookeeper with -a.  This can be added to get, set, dump, and load.
+
 ```sh
 $ zeke -a localhost:2181 -d /com/yodle/conf/tech > dumpfile.zk
 ```
 
 ### Why?
 Zeke was written to replace our old script zkconfig.py.  Zeke is an improvement over zkconfig in the following ways:
+
 - Zeke has a sane command-line UI, zkconfig's interface was crazy
 - Zeke works with python2 and python3, zkconfig only worked with python2
 - Zeke works on Mac OSX, zkconfig did not (at the very least it was difficult to get installed properly)
