@@ -74,3 +74,5 @@ graphite_host=`/opt/zkconfig/zkconfig.py -g /dev/null -d -p /com/yodle/conf/tech
 - zkconfig had the ability to prepend a path to the node names while loading a file.  I'm not sure that we ever used this feature, but zeke doesn't have it.
 - zkconfig logged all of its actions to a place in /natpal/logs.  I don't like the idea of hard-coding a log location like this, and I'm not sure that we have ever looked at the zkconfig logs anyway.
 - zkconfig can load files that were created by zeke, but due to the strict quoting rules of json (only double-quotes are valid), zeke can not load files that were created by zkconfig
+- zeke currently fails when dumping data that is non-utf8.  IMO this is reasonable since we shouldn't have non-utf-8 data in ZK, but there may be a better way to handle it.
+
