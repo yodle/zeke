@@ -9,10 +9,10 @@ else:
 
 setup(
     name='zeke',
-    version='0.0.1',
+    version='0.1.0',
     author='Yodle',
     author_email='noreply@yodle.com',
-    url='http://git.yodle.com/markdrago/zeke',
+    url='https://git.yodle.com/projects/TOOL/repos/zeke/browse',
     description='Mess around with zookeeper',
     packages=['zeke'],
     entry_points={
@@ -27,7 +27,7 @@ setup(
         'Programming Language :: Python :: 2',
         'Programming Language :: Python :: 3',
         'Operating System :: POSIX',
-        'Development Status :: 4 - `eta',
+        'Development Status :: 4 - Beta',
         'Intended Audience :: Developers',
         'Topic :: Utilities'
     ],
