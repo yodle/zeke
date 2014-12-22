@@ -64,11 +64,35 @@ class TestCommands(unittest.TestCase):
     def test_format_pairs_for_output(self):
         pairs = [
             ['/a/b', b'3'],
-            ['/c/d', b'4']
+            ['/c/d', None]
         ]
         result = commands._format_pairs_for_output(pairs)
-        expected = '["/a/b", "3"]\n["/c/d", "4"]'
+        expected = '["/a/b", "3"]\n["/c/d", ""]'
         self.assertEqual(result, expected)
+
+    def test_clean_value_decodes_string_properly(self):
+        self.assertEqual("abc", commands._clean_value(b'abc'))
+
+    def test_clean_value_returns_blank_string_for_none(self):
+        self.assertEqual("", commands._clean_value(None))
+
+    def test_clean_value_ignores_non_utf8_value(self):
+        bad = b'\xb7'
+        self.assertEqual(bad, commands._clean_value(bad))
+
+    def test_convert_pair_to_json(self):
+        pair = ("key", "value")
+        self.assertEqual('["key", "value"]', commands._convert_pair_to_json(pair))
+
+    @patch(builtins_name + '.print')
+    def test_convert_pair_to_json_on_error(self, mock_print):
+        bad = b'\xb7'
+        pair = ("key", bad)
+
+        # raises UnicodeDecodeError for python2, TypeError in python3
+        with self.assertRaises((TypeError, UnicodeDecodeError)):
+            commands._convert_pair_to_json(pair)
+        mock_print.assert_called_once_with("Unable to encode value for key: key\n", file=sys.stderr)
 
     def test_get_sorted_list_of_descendants_sorts_results(self):
         mock_zk = Mock()
@@ -158,3 +182,4 @@ class TestCommands(unittest.TestCase):
         zk.set_or_create.assert_any_call("/a", "hey")
         zk.set_or_create.assert_any_call("/b", "there")
         self.assertEqual(zk.set_or_create.call_count, 2)
+

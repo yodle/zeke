@@ -43,9 +43,31 @@ def _get_sorted_list_of_descendants_with_values(zk, key):
 
 
 def _format_pairs_for_output(pairs):
-    pairs_of_strings = map(lambda p: [p[0], p[1].decode('utf-8')], pairs)
-    list_of_json_lists = map(lambda p: json.dumps(p), pairs_of_strings)
+    pairs_of_strings = map(_get_pairs_of_strings_if_possible, pairs)
+    list_of_json_lists = map(_convert_pair_to_json, pairs_of_strings)
     return '\n'.join(list_of_json_lists)
+
+
+def _get_pairs_of_strings_if_possible(pair):
+    return pair[0], _clean_value(pair[1])
+
+
+def _clean_value(value):
+    if not value:
+        return ''
+
+    try:
+        return value.decode('utf-8')
+    except UnicodeDecodeError:
+        return value
+
+
+def _convert_pair_to_json(pair):
+    try:
+        return json.dumps(pair)
+    except (TypeError, UnicodeDecodeError) as e:
+        print("Unable to encode value for key: %s\n" % pair[0], file=sys.stderr)
+        raise e
 
 
 def load(host):
