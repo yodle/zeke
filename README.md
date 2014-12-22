@@ -60,6 +60,7 @@ Zeke was written to replace our old script zkconfig.py.  Zeke is an improvement 
 - Zeke installs like a proper python package, zkconfig was a single-file script that had to be copied around
 - Zeke writes and reads json, zkconfig wrote stringified python lists and parsed them using eval
 - Zeke has unit tests, zkconfig did not
+- Zeke is obviously a better name than zkconfig
 
 I started writing zeke after writing the following line to get a value out of zookeeper with zkconfig:
 
