@@ -62,6 +62,7 @@ Zeke was written to replace our old script zkconfig.py.  Zeke is an improvement 
 - Zeke has unit tests, zkconfig did not
 
 I started writing zeke after writing the following line to get a value out of zookeeper with zkconfig:
+
 ```sh
 graphite_host=`/opt/zkconfig/zkconfig.py -g /dev/null -d -p /com/yodle/conf/tech/metrics/graphite-host 2> /dev/null | grep graphite-host | grep -v -e server-specific -e '#' | sed -e "s/.*graphite-host', '//" -e "s/'.*//"`
 ```
