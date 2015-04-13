@@ -10,17 +10,25 @@ def main():
 
 def parse_options(args):
     parser = argparse.ArgumentParser(description='Mess around with Zookeeper')
+    parser.add_argument('--version', action='store_true', help='echoes the version of zeke you are using')
     parser.add_argument('--discover', action='store_true', help='discover zookeeper via DNS and output its host:port')
     parser.add_argument('-g', '--get', help='get value out of zookeeper and print it', metavar='KEY')
     parser.add_argument('-s', '--set', help='set value in zookeeper', nargs=2, metavar=('KEY', 'VAL'))
     parser.add_argument('-d', '--dump', help='dump child nodes of given key to stdout', metavar='KEY')
     parser.add_argument('-l', '--load', action='store_true', help='load nodes and values in to zookeeper from stdin')
     parser.add_argument('-a', '--address', help='specify the host/port of zookeeper', metavar='ADDR')
+
+    if len(args)==0:
+        print parser.print_help()
+
     return vars(parser.parse_args(args))
 
 
 def dispatch(parser_results):
     try:
+        if parser_results['version']:
+            commands.version()
+
         if parser_results['discover']:
             commands.discover()
         elif parser_results['get']:
