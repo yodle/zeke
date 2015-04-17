@@ -2,9 +2,14 @@ from __future__ import print_function
 
 import sys
 import json
+import pkg_resources
 import base64
 
 from . import zookeeper, dnsops
+
+
+def version():
+    print('zeke version', pkg_resources.require("zeke")[0].version);
 
 
 def discover():
