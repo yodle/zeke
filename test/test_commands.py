@@ -76,9 +76,9 @@ class TestCommands(unittest.TestCase):
     def test_clean_value_returns_blank_string_for_none(self):
         self.assertEqual("", commands._clean_value(None))
 
-    def test_clean_value_ignores_non_utf8_value(self):
-        bad = b'\xb7'
-        self.assertEqual(bad, commands._clean_value(bad))
+    def test_clean_value_does_base64_conversion(self):
+        badutf8 = b'\xb7'
+        self.assertEqual("base64:tw==", commands._clean_value(badutf8))
 
     def test_convert_pair_to_json(self):
         pair = ("key", "value")
@@ -139,13 +139,17 @@ class TestCommands(unittest.TestCase):
         with self.assertRaises(commands.CommandError):
             commands._parse_line('{"hello": "there", "more": "stuff"}')
 
-    def test_parse_line_converts_items_to_strings(self):
+    def test_parse_line_converts_items_to_bytes(self):
         results = commands._parse_line('["/a", 3]')
-        self.assertEqual(results[1], "3")
+        self.assertEqual(results[1], b"3")
+
+    def test_parse_line_converts_base64_to_binary(self):
+        results = commands._parse_line('["/a", "base64:tw=="]')
+        self.assertEqual(results[1], b'\xb7')
 
     def test_parse_line_works_properly_given_normal_input(self):
         results = commands._parse_line('["/a", "hello"]')
-        self.assertEqual(("/a", "hello"), results)
+        self.assertEqual(("/a", b"hello"), results)
 
     def test_parse_all_lines_can_parse_multiple_lines(self):
         lines = [
@@ -154,8 +158,8 @@ class TestCommands(unittest.TestCase):
         ]
         results = commands._parse_all_lines(lines)
         expected = [
-            ("/a", "hello"),
-            ("/b", "there")
+            ("/a", b"hello"),
+            ("/b", b"there")
         ]
         self.assertEqual(results, expected)
 
@@ -179,7 +183,7 @@ class TestCommands(unittest.TestCase):
 
         commands.load('host:1234')
 
-        zk.set_or_create.assert_any_call("/a", "hey")
-        zk.set_or_create.assert_any_call("/b", "there")
+        zk.set_or_create.assert_any_call("/a", b"hey")
+        zk.set_or_create.assert_any_call("/b", b"there")
         self.assertEqual(zk.set_or_create.call_count, 2)
 
