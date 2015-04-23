@@ -58,7 +58,7 @@ class TestZookeeper(unittest.TestCase):
     def test_create_calls_proper_create(self, mock_kazoo_client):
         mock_zk = self.setup_mock_zk(mock_kazoo_client)
         zk = zookeeper.Zookeeper(['host:1234'])
-        zk.create_node('key', 'value')
+        zk.create_node('key', b'value')
         mock_zk.create.assert_called_once_with('key', b'value', makepath=True)
 
     @patch('zeke.zookeeper.KazooClient')
@@ -74,7 +74,7 @@ class TestZookeeper(unittest.TestCase):
     def test_set_calls_proper_kazoo_method(self, mock_kazoo_client):
         mock_zk = self.setup_mock_zk(mock_kazoo_client)
         zk = zookeeper.Zookeeper(['host:1234'])
-        zk.set_value('key', 'value')
+        zk.set_value('key', b'value')
         mock_zk.set.assert_called_once_with('key', b'value')
 
     @patch('zeke.zookeeper.KazooClient')

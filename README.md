@@ -50,6 +50,16 @@ It is possible to override the DNS discovery mechanism by specifying the locatio
 $ zeke -a localhost:2181 -d /com/yodle/conf/tech > dumpfile.zk
 ```
 
+#### Handling non-UTF-8 data
+Zookeeper [requires that all keys be a subset of UTF-8](https://zookeeper.apache.org/doc/trunk/zookeeperProgrammers.html#ch_zkDataModel),
+so Zeke does not handle non-UTF-8 keys either.  However, zookeeper values can be any arbitrary data.  Zeke uses UTF-8
+when reading/writing data.  To be able to use UTF-8, Zeke will encode any non-UTF-8 data with base64.  To indicate that
+a value is encoded with base64 zeke will prepend the output with "base64:".  For example, if zeke comes across a value
+with a single byte of B7, which is invalid UTF-8, Zeke will output "base64:tw==".  Likewise, if Zeke is given a value
+that begins with "base64:" it will strip off that label, decode the remainder of the string with base64, and use the
+result when setting the value in zookeeper.
+
+
 ### Why?
 Zeke was written to replace our old script zkconfig.py.  Zeke is an improvement over zkconfig in the following ways:
 
@@ -74,5 +84,3 @@ graphite_host=`/opt/zkconfig/zkconfig.py -g /dev/null -d -p /com/yodle/conf/tech
 - zkconfig had the ability to prepend a path to the node names while loading a file.  I'm not sure that we ever used this feature, but zeke doesn't have it.
 - zkconfig logged all of its actions to a place in /natpal/logs.  I don't like the idea of hard-coding a log location like this, and I'm not sure that we have ever looked at the zkconfig logs anyway.
 - zkconfig can load files that were created by zeke, but due to the strict quoting rules of json (only double-quotes are valid), zeke can not load files that were created by zkconfig
-- zeke currently fails when dumping data that is non-utf8.  IMO this is reasonable since we shouldn't have non-utf-8 data in ZK, but there may be a better way to handle it.
-

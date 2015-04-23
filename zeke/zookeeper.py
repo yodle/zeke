@@ -29,13 +29,13 @@ class Zookeeper(object):
 
     def create_node(self, key, value):
         try:
-            self.zk.create(key, self.value_str_to_bytestring(value), makepath=True)
+            self.zk.create(key, value, makepath=True)
         except kazooExceptions.NodeExistsError as e:
             raise NodeExistsError(e)
 
     def set_value(self, key, value):
         try:
-            self.zk.set(key, self.value_str_to_bytestring(value))
+            self.zk.set(key, value)
         except kazooExceptions.NoNodeError as e:
             raise NoNodeError(e)
 
@@ -68,10 +68,6 @@ class Zookeeper(object):
             results = results | self.get_descendants_of_node(child)
 
         return results
-
-    @staticmethod
-    def value_str_to_bytestring(value):
-        return value.encode('utf-8')
 
 
 class NodeExistsError(kazooExceptions.NodeExistsError):

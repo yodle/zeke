@@ -3,11 +3,14 @@ from __future__ import print_function
 import sys
 import json
 import pkg_resources
+import base64
 
 from . import zookeeper, dnsops
 
+
 def version():
     print('zeke version', pkg_resources.require("zeke")[0].version);
+
 
 def discover():
     for result in dnsops.discover_zk_via_dns():
@@ -17,8 +20,7 @@ def discover():
 def print_value(key, host):
     try:
         zk = get_zk(host)
-        result = zk.get_value(key)
-        print(result.decode('utf-8'))
+        print(_clean_value(zk.get_value(key)))
     except zookeeper.NoNodeError as e:
         print('Node not found:', key, file=sys.stderr)
         raise CommandError(e)
@@ -26,7 +28,7 @@ def print_value(key, host):
 
 def set_value(key, value, host):
     zk = get_zk(host)
-    zk.set_or_create(key, value)
+    zk.set_or_create(key, _prepare_value_for_storage(value))
 
 
 def dump(key, host):
@@ -62,7 +64,7 @@ def _clean_value(value):
     try:
         return value.decode('utf-8')
     except UnicodeDecodeError:
-        return value
+        return "base64:" + base64.b64encode(value).decode('utf-8')
 
 
 def _convert_pair_to_json(pair):
@@ -99,7 +101,20 @@ def _parse_line(line):
         raise CommandError('expected line to be of type list but found something else: %s' % type(pair))
     if len(pair) != 2:
         raise CommandError('expected 2 elements in line (key/value), but got %d' % len(pair))
-    return tuple(map(lambda item: str(item), pair))
+    return _clean_parsed_pair(pair)
+
+
+def _clean_parsed_pair(pair):
+    pair = tuple(map(lambda item: str(item), pair))
+    return pair[0], _prepare_value_for_storage(pair[1])
+
+
+def _prepare_value_for_storage(value):
+    label = "base64:"
+    if value.startswith(label):
+        return base64.b64decode(value[len(label):])
+    else:
+        return value.encode('utf-8')
 
 
 def get_zk(host):
