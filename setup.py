@@ -9,7 +9,7 @@ else:
 
 setup(
     name='zeke',
-    version='0.1.3',
+    version='0.1.4',
     author='Yodle',
     author_email='noreply@yodle.com',
     url='https://git.yodle.com/projects/TOOL/repos/zeke/browse',

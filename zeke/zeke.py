@@ -18,18 +18,17 @@ def parse_options(args):
     parser.add_argument('-l', '--load', action='store_true', help='load nodes and values in to zookeeper from stdin')
     parser.add_argument('-a', '--address', help='specify the host/port of zookeeper', metavar='ADDR')
 
-    if len(args)==0:
-        print parser.print_help()
+    if len(args) == 0:
+        parser.print_help()
 
     return vars(parser.parse_args(args))
 
 
 def dispatch(parser_results):
     try:
-        if parser_results['version']:
+        if 'version' in parser_results and parser_results['version']:
             commands.version()
-
-        if parser_results['discover']:
+        elif 'discover' in parser_results and parser_results['discover']:
             commands.discover()
         elif parser_results['get']:
             commands.print_value(parser_results['get'], parser_results['address'])
@@ -37,7 +36,7 @@ def dispatch(parser_results):
             commands.set_value(parser_results['set'][0], parser_results['set'][1], parser_results['address'])
         elif parser_results['dump']:
             commands.dump(parser_results['dump'], parser_results['address'])
-        elif parser_results['load']:
+        elif 'load' in parser_results and parser_results['load']:
             commands.load(parser_results['address'])
     except commands.CommandError:
         return 1

@@ -9,7 +9,7 @@ from . import zookeeper, dnsops
 
 
 def version():
-    print('zeke version', pkg_resources.require("zeke")[0].version);
+    print(pkg_resources.require("zeke")[0].version);
 
 
 def discover():
