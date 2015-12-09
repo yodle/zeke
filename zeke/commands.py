@@ -25,12 +25,10 @@ def print_value(key, host):
         print('Node not found:', key, file=sys.stderr)
         raise CommandError(e)
 
-
 def set_value(key, value, host):
     zk = get_zk(host)
     zk.set_or_create(key, _prepare_value_for_storage(value))
-
-
+    
 def dump(key, host):
     try:
         zk = get_zk(host)
@@ -40,7 +38,23 @@ def dump(key, host):
         print('Node not found', file=sys.stderr)
         raise(CommandError(e))
 
+def delete(key, host):
+    try:
+        zk = get_zk(host)
+        zk.delete(key, recursive=False)
+    except zookeeper.NoNodeError:
+        pass
+    except zookeeper.NotEmptyError as e:
+        print('Tried to delete: ' + key + ' but node is not empty', file=sys.stderr)
+        raise(CommandError(e))
 
+def purge(key, host):
+    try:
+        zk = get_zk(host)
+        zk.delete(key, recursive=True)
+    except zookeeper.NoNodeError:
+        pass
+    
 def _get_sorted_list_of_descendants_with_values(zk, key):
     descendants = list(zk.get_descendants_of_node(key))
     descendants.sort()
