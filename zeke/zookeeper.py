@@ -1,5 +1,3 @@
-from __future__ import print_function
-
 from kazoo.client import KazooClient
 from kazoo import exceptions as kazooExceptions
 

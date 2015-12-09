@@ -18,6 +18,7 @@ def parse_options(args):
     parser.add_argument('-l', '--load', action='store_true', help='load nodes and values in to zookeeper from stdin')
     parser.add_argument('-a', '--address', help='specify the host/port of zookeeper', metavar='ADDR')
     parser.add_argument('--delete', help='delete value from zookeeper', metavar='KEY')
+    parser.add_argument('--purge', help='purge a node from zookeeper', metavar='KEY')
     
     if len(args) == 0:
         parser.print_help()
@@ -39,6 +40,8 @@ def dispatch(parser_results):
             commands.dump(parser_results['dump'], parser_results['address'])
         elif parser_results['delete']:
             commands.delete(parser_results['delete'], parser_results['address'])
+        elif parser_results['purge']:
+            commands.purge(parser_results['purge'], parser_results['address'])
         elif 'load' in parser_results and parser_results['load']:
             commands.load(parser_results['address'])
     except commands.CommandError:

@@ -90,9 +90,14 @@ class TestZeke(unittest.TestCase):
         load_mock.assert_called_once_with(None)
 
     @patch('zeke.commands.delete')
-    def test_dispatch_todelete(self, delete_mock):
+    def test_dispatch_to_delete(self, delete_mock):
         zeke.dispatch(self.create_parser_results({'delete': 'key'}))
         delete_mock.assert_called_once_with('key', None)
+
+    @patch('zeke.commands.purge')
+    def test_dispatch_to_purge(self, purge_mock):
+        zeke.dispatch(self.create_parser_results({'purge' : 'key'}))
+        purge_mock.assert_called_once_with('key', None)
         
     @staticmethod
     def create_parser_results(args):
@@ -103,7 +108,8 @@ class TestZeke(unittest.TestCase):
             'set': None,
             'dump': None,
             'load': False,
-            'delete': False
+            'delete': None,
+            'purge' : None
         }
         results.update(args)
         return results

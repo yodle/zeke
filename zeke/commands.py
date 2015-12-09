@@ -41,7 +41,7 @@ def dump(key, host):
 def delete(key, host):
     try:
         zk = get_zk(host)
-        zk.delete(key, recursive=False)
+        zk.delete(key, recursive = False)
     except zookeeper.NoNodeError:
         pass
     except zookeeper.NotEmptyError as e:
@@ -51,7 +51,7 @@ def delete(key, host):
 def purge(key, host):
     try:
         zk = get_zk(host)
-        zk.delete(key, recursive=True)
+        zk.delete(key, recursive = True)
     except zookeeper.NoNodeError:
         pass
     
