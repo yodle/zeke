@@ -104,6 +104,29 @@ class TestZookeeper(unittest.TestCase):
         zk.set_or_create('key', 'value')
         mock_create_node.assert_called_once_with('key', 'value')
 
+    @patch('zeke.zookeeper.KazooClient')    
+    def test_detete_calls_kazoo_properly(self, mock_kazoo_client):
+        mock_zk = self.setup_mock_zk(mock_kazoo_client)
+        zk = zookeeper.Zookeeper(['host:1234'])
+        zk.delete('key', False)
+        mock_zk.delete.called_once_with('key', False)
+
+    @patch('zeke.zookeeper.KazooClient')
+    def test_delete_raises_no_node_error(self, mock_kazoo_client):
+        mock_zk = self.setup_mock_zk(mock_kazoo_client)
+        mock_zk.delete.side_effect = kazooExceptions.NoNodeError
+        zk = zookeeper.Zookeeper(['host:1234'])
+        with self.assertRaises(zookeeper.NoNodeError):
+            zk.delete('key', False)
+
+    @patch('zeke.zookeeper.KazooClient')
+    def test_delete_raises_not_empty_error(self, mock_kazoo_client):
+        mock_zk = self.setup_mock_zk(mock_kazoo_client)
+        mock_zk.delete.side_effect = kazooExceptions.NotEmptyError
+        zk = zookeeper.Zookeeper(['host:1234'])
+        with self.assertRaises(zookeeper.NotEmptyError):
+            zk.delete('key', False)
+        
     @patch('zeke.zookeeper.KazooClient')
     def test_get_children_calls_kazoo_properly(self, mock_kazoo_client):
         mock_zk = self.setup_mock_zk(mock_kazoo_client)

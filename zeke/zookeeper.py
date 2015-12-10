@@ -45,12 +45,20 @@ class Zookeeper(object):
         else:
             self.create_node(key, value)
 
+    def delete(self, key, recursive=False):
+        try:
+            self.zk.delete(key, recursive)
+        except kazooExceptions.NoNodeError as e:
+            raise NoNodeError(e)
+        except kazooExceptions.NotEmptyError as e:
+            raise NotEmptyError(e)
+            
     def get_children(self, key):
         try:
             return self.zk.get_children(key)
         except kazooExceptions.NoNodeError as e:
             raise NoNodeError(e)
-
+        
     def get_descendants_of_node(self, key):
         # remove trailing slash, and treat an empty path as the root path
         key = key.rstrip('/')
@@ -75,4 +83,8 @@ class NodeExistsError(kazooExceptions.NodeExistsError):
 
 
 class NoNodeError(kazooExceptions.NoNodeError):
+    pass
+
+
+class NotEmptyError(kazooExceptions.NotEmptyError):
     pass

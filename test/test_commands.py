@@ -123,6 +123,49 @@ class TestCommands(unittest.TestCase):
             commands.dump('/a', 'host')
         mock_print.assert_called_once_with('Node not found', file=sys.stderr)
 
+    @patch('zeke.commands.zookeeper.Zookeeper')    
+    def test_delete_calls_zk(self, mock_zookeeper):
+        mock_zk = Mock()
+        mock_zookeeper.return_value = mock_zk
+        
+        commands.delete('key', 'host')
+        mock_zk.delete.assert_called_once_with('key', recursive = False)
+
+    @patch('zeke.commands.zookeeper.Zookeeper')    
+    def test_delete_does_nothing_on_no_node_error(self, mock_zookeeper):
+        mock_zk = Mock()
+        mock_zk.delete.side_effect = zookeeper.NoNodeError
+        mock_zookeeper.return_value = mock_zk
+
+        commands.delete('key', 'host')
+
+    @patch(builtins_name + '.print')    
+    @patch('zeke.commands.zookeeper.Zookeeper')
+    def test_delete_fails_when_not_empty(self, mock_zookeeper, mock_print):
+        mock_zk = Mock()
+        mock_zk.delete.side_effect = zookeeper.NotEmptyError
+        mock_zookeeper.return_value = mock_zk
+
+        with self.assertRaises(commands.CommandError):
+            commands.delete('key', 'host')
+        mock_print.assert_called_once_with('Tried to delete: key but node contains child nodes', file=sys.stderr)
+
+    @patch('zeke.commands.zookeeper.Zookeeper')
+    def test_purge_calls_zk(self, mock_zookeeper):
+        mock_zk = Mock()
+        mock_zookeeper.return_value = mock_zk
+
+        commands.purge('key', 'host')
+        mock_zk.delete.assert_called_once_with('key', recursive = True)
+
+    @patch('zeke.commands.zookeeper.Zookeeper')
+    def test_purge_does_nothing_on_no_node_error(self, mock_zookeeper):
+        mock_zk = Mock()
+        mock_zk.delete.side_effect = zookeeper.NoNodeError
+        mock_zookeeper.return_value = mock_zk
+
+        commands.purge('key', 'host')
+        
     def test_parse_line_raises_command_error_for_bad_json(self):
         with self.assertRaises(commands.CommandError):
             commands._parse_line('some line that is not json')
