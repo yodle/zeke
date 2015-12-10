@@ -148,7 +148,7 @@ class TestCommands(unittest.TestCase):
 
         with self.assertRaises(commands.CommandError):
             commands.delete('key', 'host')
-        mock_print.assert_called_once_with('Tried to delete: key but node is not empty', file=sys.stderr)
+        mock_print.assert_called_once_with('Tried to delete: key but node contains child nodes', file=sys.stderr)
 
     @patch('zeke.commands.zookeeper.Zookeeper')
     def test_purge_calls_zk(self, mock_zookeeper):

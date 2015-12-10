@@ -45,7 +45,7 @@ class Zookeeper(object):
         else:
             self.create_node(key, value)
 
-    def delete(self, key, recursive):
+    def delete(self, key, recursive=False):
         try:
             self.zk.delete(key, recursive)
         except kazooExceptions.NoNodeError as e:

@@ -45,7 +45,7 @@ def delete(key, host):
     except zookeeper.NoNodeError:
         pass
     except zookeeper.NotEmptyError as e:
-        print('Tried to delete: ' + key + ' but node is not empty', file=sys.stderr)
+        print('Tried to delete: ' + key + ' but node contains child nodes', file=sys.stderr)
         raise(CommandError(e))
 
 def purge(key, host):
