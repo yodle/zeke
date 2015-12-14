@@ -4,7 +4,7 @@ Zeke is a simple command-line client for interacting with Zookeeper.
 
 ### Installation
 ```sh
-$ sudo pip install git+https://git.yodle.com/scm/tool/zeke.git 
+$ sudo pip install git+https://git.yodle.com/scm/tool/zeke.git
 ```
 
 ### Usage
@@ -33,8 +33,18 @@ $ cat dumpfile.zk
 $ zeke -l < dumpfile.zk
 ```
 
+#### Delete a node from zookeeper (only works on nodes without children)
+```sh
+$ zeke --delete /path/to/delete
+```
+
+#### Purge a branch of zookeeper (recursively delete all nodes) [USE CAUTION]
+```sh
+$ zeke --purge /path/to/purge
+```
+
 #### Discover Zookeeper via DNS
-The commands get, set, dump, and load default to using the zookeeper they discover via DNS.  By using --discover you can get the location of the discovered zookeeper nodes.
+The commands get, set, dump, load, delete, and purge all default to using the zookeeper they discover via DNS.  By using --discover you can get the location of the discovered zookeeper nodes.
 
 ```sh
 $ zeke --discover
@@ -80,7 +90,6 @@ graphite_host=`/opt/zkconfig/zkconfig.py -g /dev/null -d -p /com/yodle/conf/tech
 
 ### Todo
 
-- zkconfig had the ability to purge a branch from zookeeper, zeke lacks this support
 - zkconfig had the ability to prepend a path to the node names while loading a file.  I'm not sure that we ever used this feature, but zeke doesn't have it.
 - zkconfig logged all of its actions to a place in /natpal/logs.  I don't like the idea of hard-coding a log location like this, and I'm not sure that we have ever looked at the zkconfig logs anyway.
 - zkconfig can load files that were created by zeke, but due to the strict quoting rules of json (only double-quotes are valid), zeke can not load files that were created by zkconfig
