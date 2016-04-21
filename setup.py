@@ -11,7 +11,7 @@ setup(
     name='zeke',
     version='0.2.0',
     author='Yodle',
-    author_email='noreply@yodle.com',
+    author_email='mdrago@yodle.com',
     url='https://git.yodle.com/projects/TOOL/repos/zeke/browse',
     description='Mess around with zookeeper',
     packages=['zeke'],
