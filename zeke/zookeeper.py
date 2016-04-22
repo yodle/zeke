@@ -47,7 +47,8 @@ class Zookeeper(object):
 
     def delete(self, key, recursive=False):
         try:
-            self.zk.delete(key, recursive)
+            # deletes all version of the key
+            self.zk.delete(key, -1, recursive)
         except kazooExceptions.NoNodeError as e:
             raise NoNodeError(e)
         except kazooExceptions.NotEmptyError as e:
