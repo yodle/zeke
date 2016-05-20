@@ -1,17 +1,17 @@
 # Zeke
 
-Zeke is a simple command-line client for interacting with Zookeeper.
+Zeke is a command-line tool for Zookeeper that is a pleasure to use.
 
 ### Installation
 ```sh
-$ sudo pip install git+https://git.yodle.com/scm/tool/zeke.git
+$ sudo pip install zeke
 ```
 
 ### Usage
 #### Get the value of a node
 ```sh
-$ zeke -g /com/yodle/conf/tech/metrics/graphite-host
-dev-graphite.nyc.dev.yodle.com
+$ zeke -g /path/to/node
+node value
 ```
 
 #### Set the value of a node
@@ -38,26 +38,26 @@ $ zeke -l < dumpfile.zk
 $ zeke --delete /path/to/delete
 ```
 
-#### Purge a branch of zookeeper (recursively delete all nodes) [USE CAUTION]
+#### Purge a branch of zookeeper (recursively delete all nodes) [USE WITH CAUTION]
 ```sh
 $ zeke --purge /path/to/purge
 ```
 
 #### Discover Zookeeper via DNS
-The commands get, set, dump, load, delete, and purge all default to using the zookeeper they discover via DNS.  By using --discover you can get the location of the discovered zookeeper nodes.
+The commands get, set, dump, load, delete, and purge all default to using the zookeeper they discover via DNS.  Zeke looks for SRV records for `_zookeeper._tcp` and that DNS lookup will be combined with any DNS search paths that are defined on the system.  This makes it fairly easy to use this autodiscovery mechanism in separate environments.  By using --discover you can get the location of the discovered zookeeper nodes.
 
 ```sh
 $ zeke --discover
-dev-zk1.dev.yodle.com:2181
-dev-zk3.dev.yodle.com:2181
-dev-zk2.dev.yodle.com:2181
+zk1.prod.company.com:2181
+zk2.prod.company.com:2181
+zk3.prod.company.com:2181
 ```
 
 #### Specify the location of zookeeper
-It is possible to override the DNS discovery mechanism by specifying the location of zookeeper with -a.  This can be added to get, set, dump, and load.
+It is possible to override the DNS discovery mechanism by specifying the location of zookeeper with -a.  This can be added to all other commands (get, set, dump, load, delete, purge).
 
 ```sh
-$ zeke -a localhost:2181 -d /com/yodle/conf/tech > dumpfile.zk
+$ zeke -a localhost:2181 -d /path/to/dump > dumpfile.zk
 ```
 
 #### Handling non-UTF-8 data
@@ -71,7 +71,15 @@ result when setting the value in zookeeper.
 
 
 ### Why?
-Zeke was written to replace our old script zkconfig.py.  Zeke is an improvement over zkconfig in the following ways:
+Why create zeke when zkCli.sh exists?
+
+- Zeke is a joy to use on the command-line and in scripts where zkCli.sh feels out of place and awkward
+- Zeke supports dump and loading full trees of zookeeper
+- Zeke supports autodiscovery of zookeeper nodes via DNS
+- Zeke is easier to install than zkCli.sh
+
+
+Zeke was originally written to replace one of our old scripts called zkconfig.py.  Zeke is an improvement over zkconfig in the following ways:
 
 - Zeke has a sane command-line UI, zkconfig's interface was crazy
 - Zeke works with python2 and python3, zkconfig only worked with python2
@@ -85,11 +93,5 @@ Zeke was written to replace our old script zkconfig.py.  Zeke is an improvement 
 I started writing zeke after writing the following line to get a value out of zookeeper with zkconfig:
 
 ```sh
-graphite_host=`/opt/zkconfig/zkconfig.py -g /dev/null -d -p /com/yodle/conf/tech/metrics/graphite-host 2> /dev/null | grep graphite-host | grep -v -e server-specific -e '#' | sed -e "s/.*graphite-host', '//" -e "s/'.*//"`
+graphite_host=`/opt/zkconfig/zkconfig.py -g /dev/null -d -p /com/company/conf/tech/metrics/graphite-host 2> /dev/null | grep graphite-host | grep -v -e server-specific -e '#' | sed -e "s/.*graphite-host', '//" -e "s/'.*//"`
 ```
-
-### Todo
-
-- zkconfig had the ability to prepend a path to the node names while loading a file.  I'm not sure that we ever used this feature, but zeke doesn't have it.
-- zkconfig logged all of its actions to a place in /natpal/logs.  I don't like the idea of hard-coding a log location like this, and I'm not sure that we have ever looked at the zkconfig logs anyway.
-- zkconfig can load files that were created by zeke, but due to the strict quoting rules of json (only double-quotes are valid), zeke can not load files that were created by zkconfig
