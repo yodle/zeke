@@ -12,8 +12,8 @@ setup(
     version='0.2.1',
     author='Yodle',
     author_email='mdrago@yodle.com',
-    url='https://git.yodle.com/projects/TOOL/repos/zeke/browse',
-    description='Mess around with zookeeper',
+    url='https://github.com/yodle/zeke',
+    description='A command-line tool for Zookeeper that is a pleasure to use',
     packages=['zeke'],
     entry_points={
         'console_scripts': [
@@ -32,6 +32,6 @@ setup(
         'Topic :: Utilities'
     ],
     long_description="""
-**Zeke lets you mess around with zookeeper**
+**Zeke is a command-line tool for Zookeeper that is a pleasure to use.**
 """
 )
