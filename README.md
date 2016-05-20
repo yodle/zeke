@@ -74,9 +74,8 @@ result when setting the value in zookeeper.
 Why create zeke when zkCli.sh exists?
 
 - Zeke is a joy to use on the command-line and in scripts where zkCli.sh feels out of place and awkward
-- Zeke supports dump and loading full trees of zookeeper
+- Zeke supports dumping and loading full trees of zookeeper
 - Zeke supports autodiscovery of zookeeper nodes via DNS
-- Zeke is easier to install than zkCli.sh
 
 
 Zeke was originally written to replace one of our old scripts called zkconfig.py.  Zeke is an improvement over zkconfig in the following ways:
