@@ -1,15 +1,9 @@
-import sys
 from setuptools import setup
 
 
-if sys.version_info >= (3,):
-    dnspython = "dnspython3"
-else:
-    dnspython = "dnspython"
-
 setup(
     name='zeke',
-    version='0.2.1',
+    version='0.2.2',
     author='Yodle',
     author_email='mdrago@yodle.com',
     url='https://github.com/yodle/zeke',
@@ -21,7 +15,7 @@ setup(
         ]
     },
     tests_require=['mock'],
-    install_requires=['kazoo', dnspython],
+    install_requires=['kazoo', 'dnspython'],
     test_suite='test',
     classifiers=[
         'Programming Language :: Python :: 2',
